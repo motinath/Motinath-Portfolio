@@ -3,77 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0d1117;
-  --text: #c9d1d9;
-  --accent-start: #58a6ff;
-  --accent-end: #bc8cff;
-  --green: #3fb950;
-  --muted: rgba(139, 148, 158, 0.04);
-  
-  /* VS Code UI Custom colors (GitHub Dark - Default Dark Theme) */
-  --vscode-titlebar-bg: #010409;
-  --vscode-titlebar-fg: #8b949e;
-  --vscode-activity-bg: #010409;
-  --vscode-sidebar-bg: #010409;
-  --vscode-editor-bg: #0d1117;
-  --vscode-tabs-bg: #010409;
-  --vscode-tab-active-bg: #0d1117;
-  --vscode-tab-inactive-bg: #010409;
-  --vscode-tab-border: #21262d;
-  --vscode-tab-active-border: #f78166;
-  --vscode-statusbar-bg: #010409;
-  --vscode-statusbar-fg: #8b949e;
-  --vscode-border: #21262d;
-  --vscode-text: #c9d1d9;
-  --vscode-text-muted: #8b949e;
-}
-
-/* 👤 ONE DARK PRO THEME OVERRIDES */
-.theme-one-dark-pro {
-  --bg: #282c34;
-  --text: #abb2bf;
-  --vscode-titlebar-bg: #21252b;
-  --vscode-titlebar-fg: #abb2bf;
-  --vscode-activity-bg: #21252b;
-  --vscode-sidebar-bg: #21252b;
-  --vscode-editor-bg: #282c34;
-  --vscode-tabs-bg: #21252b;
-  --vscode-tab-active-bg: #282c34;
-  --vscode-tab-inactive-bg: #21252b;
-  --vscode-tab-border: #181a1f;
-  --vscode-tab-active-border: #61afef;
-  --vscode-statusbar-bg: #21252b;
-  --vscode-statusbar-fg: #abb2bf;
-  --vscode-border: #181a1f;
-  --vscode-text: #abb2bf;
-  --vscode-text-muted: #5c6370;
-}
-
-/* 🧛 DRACULA THEME OVERRIDES */
-.theme-dracula {
-  --bg: #282a36;
-  --text: #f8f8f2;
-  --vscode-titlebar-bg: #191a21;
-  --vscode-titlebar-fg: #6272a4;
-  --vscode-activity-bg: #191a21;
-  --vscode-sidebar-bg: #21222c;
-  --vscode-editor-bg: #282a36;
-  --vscode-tabs-bg: #191a21;
-  --vscode-tab-active-bg: #282a36;
-  --vscode-tab-inactive-bg: #191a21;
-  --vscode-tab-border: rgba(189, 147, 249, 0.15);
-  --vscode-tab-active-border: #ff79c6;
-  --vscode-statusbar-bg: #191a21;
-  --vscode-statusbar-fg: #f8f8f2;
-  --vscode-border: rgba(189, 147, 249, 0.15);
-  --vscode-text: #f8f8f2;
-  --vscode-text-muted: #6272a4;
-}
-
-/* 🌅 AYU DARK THEME OVERRIDES */
-.theme-ayu-dark {
   --bg: #0a0e14;
   --text: #b3b1ad;
+  --accent-start: #e6b450;
+  --accent-end: #ffb454;
+  --green: #7fd962;
+  --muted: rgba(92, 103, 115, 0.08);
+  
+  /* VS Code UI Custom colors (Ayu Dark Theme) */
   --vscode-titlebar-bg: #0d131a;
   --vscode-titlebar-fg: #b3b1ad;
   --vscode-activity-bg: #0d131a;
@@ -89,35 +26,6 @@
   --vscode-border: #111822;
   --vscode-text: #b3b1ad;
   --vscode-text-muted: #5c6773;
-}
-
-/* ❄️ NORD THEME OVERRIDES */
-.theme-nord {
-  --bg: #2e3440;
-  --text: #d8dee9;
-  --vscode-titlebar-bg: #232831;
-  --vscode-titlebar-fg: #d8dee9;
-  --vscode-activity-bg: #232831;
-  --vscode-sidebar-bg: #2e3440;
-  --vscode-editor-bg: #2e3440;
-  --vscode-tabs-bg: #232831;
-  --vscode-tab-active-bg: #2e3440;
-  --vscode-tab-inactive-bg: #232831;
-  --vscode-tab-border: #3b4252;
-  --vscode-tab-active-border: #88c0d0;
-  --vscode-statusbar-bg: #232831;
-  --vscode-statusbar-fg: #d8dee9;
-  --vscode-border: #3b4252;
-  --vscode-text: #d8dee9;
-  --vscode-text-muted: #4c566a;
-}
-
-html.light {
-  --bg: #1E1E1E;
-  --text: #D4D4D4;
-  --accent-start: #007ACC;
-  --accent-end: #BBCCD7;
-  --muted: rgba(215, 226, 234, 0.04);
 }
 
 * {

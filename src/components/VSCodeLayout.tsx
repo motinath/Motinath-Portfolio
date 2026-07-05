@@ -115,8 +115,6 @@ export function VSCodeLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [timeString, setTimeString] = useState<string>('');
-  const [activeTheme, setActiveTheme] = useState<string>(() => localStorage.getItem('vscode-portfolio-theme') || 'github-dark');
-  const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const [terminalInput, setTerminalInput] = useState<string>('');
@@ -213,15 +211,11 @@ export function VSCodeLayout() {
     return () => window.removeEventListener('keydown', handleToggleTerminal);
   }, []);
 
-  // Apply active theme class globally to document root
+  // Clean up any legacy active theme class globally on mount
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('theme-github-dark', 'theme-one-dark-pro', 'theme-dracula', 'theme-ayu-dark', 'theme-nord');
-    if (activeTheme !== 'github-dark') {
-      root.classList.add(`theme-${activeTheme}`);
-    }
-    localStorage.setItem('vscode-portfolio-theme', activeTheme);
-  }, [activeTheme]);
+  }, []);
 
   // Clock in status bar
   useEffect(() => {
@@ -473,45 +467,13 @@ export function VSCodeLayout() {
               </div>
             </div>
             <div 
-              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
               className="relative group w-full flex items-center justify-center cursor-pointer py-1"
             >
-              <Settings className={cn("w-5 h-5 transition-transform duration-200", showSettingsMenu ? "text-[#007ACC] rotate-45" : "text-[#858585] hover:text-[#D4D4D4]")} />
+              <Settings className="w-5 h-5 text-[#858585] hover:text-[#D4D4D4] transition-colors" />
               <div className="absolute left-[54px] bg-[var(--vscode-titlebar-bg)] border border-[var(--vscode-border)] text-[var(--vscode-text)] text-xs px-2.5 py-1 rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 whitespace-nowrap">
-                Settings (Themes)
+                Ayu Dark Theme Enabled
               </div>
             </div>
-            
-            {showSettingsMenu && (
-              <div className="absolute left-[52px] bottom-[15px] bg-[var(--vscode-titlebar-bg)] border border-[var(--vscode-border)] text-[var(--vscode-text)] text-xs rounded-md shadow-2xl z-[9999] py-1.5 w-48 font-sans">
-                <div className="px-3 py-1 text-[10px] uppercase font-bold text-[var(--vscode-text-muted)] tracking-wider">
-                  Color Themes
-                </div>
-                <div className="h-[1px] bg-[var(--vscode-border)] my-1" />
-                {[
-                  { id: 'github-dark', name: 'GitHub Dark' },
-                  { id: 'one-dark-pro', name: 'One Dark Pro' },
-                  { id: 'dracula', name: 'Dracula' },
-                  { id: 'ayu-dark', name: 'Ayu Dark' },
-                  { id: 'nord', name: 'Nord' }
-                ].map(theme => (
-                  <button
-                    key={theme.id}
-                    onClick={() => {
-                      setActiveTheme(theme.id);
-                      setShowSettingsMenu(false);
-                    }}
-                    className={cn(
-                      "w-full text-left px-3 py-1.5 hover:bg-[#007ACC] hover:text-white transition-colors flex items-center justify-between",
-                      activeTheme === theme.id && "bg-[var(--vscode-border)] font-semibold"
-                    )}
-                  >
-                    <span>{theme.name}</span>
-                    {activeTheme === theme.id && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         </div>        {/* B. SIDEBAR (EXPLORER) */}
         <motion.div
