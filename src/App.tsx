@@ -1,35 +1,55 @@
-import React from 'react';
-import { Header } from './components/Header';
-import { Hero } from './components/Hero';
-import { About } from './components/About';
-import { Services } from './components/Services';
-import { Portfolio } from './components/Portfolio';
-import { Experience } from './components/Experience';
-import { Certifications } from './components/Certifications';
-import { Contact } from './components/Contact';
-import { Footer } from './components/Footer';
-import { ThemeProvider } from './context/ThemeContext';
-import { ScrollProvider } from './context/ScrollContext';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import Welcome from './components/Welcome';
+import Experience from './components/Experience';
+import Skills from './components/Skills';
+import Projects from './components/Projects';
+import Contact from './components/Contact';
+import { VSCodeLayout } from './components/VSCodeLayout';
+import Movies from './components/Movies';
+import Gaming from './components/Gaming';
+import Story from './components/Story';
 
-function App() {
+function ScrollToTopAndHash() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Scroll internal editor pane instead of body window
+    const editorPane = document.querySelector('.overflow-y-auto');
+    if (editorPane) {
+      editorPane.scrollTo(0, 0);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location]);
+
+  return null;
+}
+
+export function App() {
   return (
-    <ThemeProvider>
-      <ScrollProvider>
-        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
-          <Header />
-          <main>
-            <Hero />
-            <About />
-            <Services />
-            <Portfolio />
-            <Experience />
-            <Certifications />
-            <Contact />
-          </main>
-          <Footer />
-        </div>
-      </ScrollProvider>
-    </ThemeProvider>
+    <Router>
+      <ScrollToTopAndHash />
+      <div 
+        className="w-full h-screen bg-[var(--vscode-editor-bg)] text-[var(--vscode-text)] font-mono selection:bg-[#264F78]/50 select-none overflow-hidden"
+      >
+        <main className="w-full h-full">
+          <Routes>
+            {/* All paths rendered inside VS Code wrapper */}
+            <Route element={<VSCodeLayout />}>
+              <Route path="/" element={<Welcome />} />
+              <Route path="/experience" element={<Experience />} />
+              <Route path="/skills" element={<Skills />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/movies" element={<Movies />} />
+              <Route path="/gaming" element={<Gaming />} />
+              <Route path="/story" element={<Story />} />
+            </Route>
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 

@@ -5,9 +5,16 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Outfit', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Consolas', 'Fira Code', 'monospace'],
       },
       colors: {
+        brand: {
+          bg: '#0C0C0C',
+          white: '#D7E2EA',
+          green: '#00E5A0',
+          muted: 'rgba(215, 226, 234, 0.08)',
+        },
         dark: {
           primary: '#000000',
           secondary: '#000000',
