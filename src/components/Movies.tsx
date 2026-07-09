@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, ExternalLink } from 'lucide-react';
+import { Heart, ExternalLink, AlertCircle } from 'lucide-react';
 import { FadeIn } from './ReusableComponents';
 
 interface Movie {
@@ -21,88 +21,7 @@ const LetterboxdLogo = () => (
   </div>
 );
 
-const FALLBACK_MOVIES: Movie[] = [
-  {
-    id: "fallback-1",
-    title: "Interstellar",
-    year: "2014",
-    director: "Christopher Nolan",
-    rating: "★★★★★",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/interstellar/"
-  },
-  {
-    id: "fallback-2",
-    title: "Inception",
-    year: "2010",
-    director: "Christopher Nolan",
-    rating: "★★★★½",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/inception/"
-  },
-  {
-    id: "fallback-3",
-    title: "Whiplash",
-    year: "2014",
-    director: "Damien Chazelle",
-    rating: "★★★★★",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/whiplash/"
-  },
-  {
-    id: "fallback-4",
-    title: "La La Land",
-    year: "2016",
-    director: "Damien Chazelle",
-    rating: "★★★★½",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/la-la-land/"
-  },
-  {
-    id: "fallback-5",
-    title: "Parasite",
-    year: "2019",
-    director: "Bong Joon Ho",
-    rating: "★★★★★",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/parasite-2019/"
-  },
-  {
-    id: "fallback-6",
-    title: "Blade Runner 2049",
-    year: "2017",
-    director: "Denis Villeneuve",
-    rating: "★★★★★",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/blade-runner-2049/"
-  },
-  {
-    id: "fallback-7",
-    title: "Spirited Away",
-    year: "2001",
-    director: "Hayao Miyazaki",
-    rating: "★★★★★",
-    liked: false,
-    poster: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/spirited-away/"
-  },
-  {
-    id: "fallback-8",
-    title: "The Truman Show",
-    year: "1998",
-    director: "Peter Weir",
-    rating: "★★★★½",
-    liked: true,
-    poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=400&q=80",
-    letterboxdUrl: "https://letterboxd.com/film/the-truman-show/"
-  }
-];
+
 
 export function Movies() {
   const [moviesList, setMoviesList] = useState<Movie[]>([]);
@@ -114,69 +33,97 @@ export function Movies() {
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        // Using rss2json service to fetch & parse Letterboxd RSS feed cleanly (avoiding CORS and client-side XML parser bloat)
-        const response = await fetch(
-          `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://letterboxd.com/motinath_/rss/')}`
-        );
+        // Using our native local/Vercel proxy to bypass CORS and scraper-blockers reliably
+        const cacheBuster = Date.now();
+        const response = await fetch(`/api/letterboxd-rss?t=${cacheBuster}`);
         if (!response.ok) {
           throw new Error('Failed to fetch from RSS proxy');
         }
-        const data = await response.json();
+        const xmlText = await response.text();
 
-        if (data.status !== 'ok') {
-          throw new Error(data.message || 'Invalid feed structure');
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+        
+        // Check for XML parsing errors
+        const parserError = xmlDoc.getElementsByTagName('parsererror')[0];
+        if (parserError) {
+          throw new Error('Failed to parse XML response');
         }
 
-        const parsedMovies: Movie[] = (data.items || []).map((item: any, idx: number) => {
-          // Extract film details from the feed title: "Film Name, Year - ★★★★½"
-          const match = item.title.match(/^(.*?),\s*(\d{4})(?:\s*-\s*(★+½?))?$/);
-          const title = match ? match[1].trim() : item.title;
-          const year = match ? match[2] : '';
-          const rating = match && match[3] ? match[3] : '';
+        const items = Array.from(xmlDoc.getElementsByTagName('item'));
 
-          // Heuristic: If rated 4 stars or higher, mark as liked (heart indicator)
-          const liked = rating.includes('★★★★') || rating.includes('★★★★★');
+        const parsedMovies: Movie[] = items
+          .map((item: Element, idx: number): Movie | null => {
+            const guid = item.getElementsByTagName('guid')[0]?.textContent || `live-${idx}`;
+            const link = item.getElementsByTagName('link')[0]?.textContent || '';
+            const itemTitle = item.getElementsByTagName('title')[0]?.textContent || '';
+            if (!itemTitle) return null;
 
-          // Parse watch date from pubDate
-          let watchDate = '';
-          if (item.pubDate) {
-            try {
-              watchDate = new Date(item.pubDate).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-              });
-            } catch (e) {
-              watchDate = '';
+            // Extract film details from the feed title: "Film Name, Year - ★★★★½"
+            // Handles full stars, half-stars, and any combination reliably.
+            const match = itemTitle.match(/^(.*?),\s*(\d{4})(?:\s*-\s*([★½]+))?$/);
+            const title = match ? match[1].trim() : itemTitle;
+            const year = match ? match[2] : '';
+            const rating = match && match[3] ? match[3] : '';
+
+            // Get description node content for poster and liked heuristic
+            const descriptionText = item.getElementsByTagName('description')[0]?.textContent || '';
+
+            // Heuristic: If rated 4 stars or higher, or explicitly liked, or 'memberLike' is Yes
+            const memberLike = item.getElementsByTagName('letterboxd:memberLike')[0]?.textContent;
+            const liked = memberLike === 'Yes' || 
+                          rating.includes('★★★★') || 
+                          rating.includes('★★★★★') || 
+                          descriptionText.includes('Liked');
+
+            // Parse watch date from letterboxd:watchedDate securely across different browsers
+            const watchedDate = item.getElementsByTagName('letterboxd:watchedDate')[0]?.textContent || '';
+            let watchDate = '';
+            if (watchedDate) {
+              try {
+                const parsedDate = new Date(watchedDate);
+                if (!isNaN(parsedDate.getTime())) {
+                  watchDate = parsedDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  });
+                }
+              } catch (e) {
+                watchDate = '';
+              }
             }
-          }
 
-          return {
-            id: item.guid || `live-${idx}`,
-            title,
-            year,
-            director: watchDate ? `Watched ${watchDate}` : '', // Show watch date dynamically
-            rating: rating || 'Unrated',
-            liked,
-            poster: item.thumbnail || '',
-            letterboxdUrl: item.link || 'https://letterboxd.com/motinath_/'
-          };
-        });
+            // Extract movie poster from description CDATA HTML content
+            let poster = '';
+            if (descriptionText) {
+              const imgMatch = descriptionText.match(/<img[^>]+src=["']([^"']+)["']/i);
+              if (imgMatch) {
+                poster = imgMatch[1];
+              }
+            }
+
+            return {
+              id: guid,
+              title,
+              year,
+              director: watchDate ? `Watched ${watchDate}` : '', // Show watch date dynamically
+              rating: rating || 'Unrated',
+              liked,
+              poster,
+              letterboxdUrl: link || 'https://letterboxd.com/motinath_/'
+            };
+          })
+          .filter((movie: Movie | null): movie is Movie => movie !== null);
 
         if (isMounted) {
-          if (parsedMovies.length > 0) {
-            setMoviesList(parsedMovies);
-            setIsFallback(false);
-          } else {
-            // Empty live feed, fall back to cached list
-            setMoviesList(FALLBACK_MOVIES);
-            setIsFallback(true);
-          }
+          setMoviesList(parsedMovies);
+          setIsFallback(false);
         }
       } catch (err) {
-        console.error('Letterboxd RSS feed error, falling back to cached list:', err);
+        console.error('Letterboxd RSS feed error:', err);
         if (isMounted) {
-          setMoviesList(FALLBACK_MOVIES);
+          setMoviesList([]);
           setIsFallback(true);
         }
       } finally {
@@ -249,6 +196,14 @@ export function Movies() {
               </div>
             ))}
           </div>
+        ) : moviesList.length === 0 ? (
+          <FadeIn delay={0.08} y={15} className="flex flex-col items-center justify-center p-12 text-center border border-dashed border-[var(--vscode-border)] rounded-xl bg-[var(--vscode-tab-inactive-bg)]/10 py-20">
+            <AlertCircle className="w-10 h-10 text-amber-500/85 mb-4" />
+            <h3 className="text-sm font-bold text-white mb-2">No Movies Found</h3>
+            <p className="text-[10px] text-[var(--vscode-text-muted)] max-w-sm leading-relaxed">
+              Could not retrieve films from your Letterboxd diary. Please ensure your profile is public and check your connection.
+            </p>
+          </FadeIn>
         ) : (
           /* Movie Posters Grid */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6 animate-fadeIn">
@@ -318,6 +273,31 @@ export function Movies() {
                 </a>
               </FadeIn>
             ))}
+
+            {/* View More Card */}
+            <FadeIn
+              delay={0.08 + moviesList.length * 0.04}
+              y={25}
+              className="group relative overflow-hidden rounded-xl border border-dashed border-[var(--vscode-border)] hover:border-[#007ACC]/55 bg-[var(--vscode-tab-inactive-bg)]/10 hover:bg-[var(--vscode-tab-inactive-bg)]/20 transition-all duration-300 shadow-md hover:-translate-y-1 select-none flex items-center justify-center aspect-[2/3]"
+            >
+              <a
+                href="https://letterboxd.com/motinath_/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center p-6 text-center w-full h-full cursor-pointer"
+              >
+                <div className="flex -space-x-2 items-center select-none flex-shrink-0 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-5 h-5 rounded-full bg-[#ff8000] shadow-[0_0_10px_rgba(255,128,0,0.5)]" />
+                  <div className="w-5 h-5 rounded-full bg-[#00e054] shadow-[0_0_10px_rgba(0,224,84,0.5)]" />
+                  <div className="w-5 h-5 rounded-full bg-[#40bcf4] shadow-[0_0_10px_rgba(64,188,244,0.5)]" />
+                </div>
+                <h3 className="text-sm font-bold text-white mb-2 group-hover:text-[#007ACC] transition-colors">View More</h3>
+                <p className="text-[10px] text-[var(--vscode-text-muted)] max-w-[120px] leading-relaxed">
+                  Explore all of my watched movies on my Letterboxd profile
+                </p>
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--vscode-text-muted)] group-hover:text-white mt-4 transition-colors" />
+              </a>
+            </FadeIn>
           </div>
         )}
 

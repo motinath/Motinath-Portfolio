@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/letterboxd-rss",
+      "destination": "https://letterboxd.com/motinath_/rss/"
+    }
+  ]
+}

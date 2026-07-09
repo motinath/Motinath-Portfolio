@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { MapPin, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FadeIn } from './ReusableComponents';
-import { cn } from '../lib/utils';
 
 // High-fidelity custom SVG logos matching the screenshot
 const SilicofellerLogo = () => (

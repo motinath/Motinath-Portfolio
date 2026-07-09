@@ -13,4 +13,13 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    proxy: {
+      '/api/letterboxd-rss': {
+        target: 'https://letterboxd.com/motinath_/rss/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/letterboxd-rss/, '')
+      }
+    }
+  }
 });

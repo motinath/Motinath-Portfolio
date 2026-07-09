@@ -20,34 +20,6 @@ interface FolderItem {
   files: FileItem[];
 }
 
-const ReactTSXIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 2a2 2 0 00-2 2v16a2 2 0 002 2h16a2 2 0 002-2V8l-6-6H4z" fill="#1e1f29" stroke="#2b2b2b" strokeWidth="1" />
-    <path d="M14 2v6h6" fill="#2c2d38" stroke="#2b2b2b" strokeWidth="1" />
-    <g transform="translate(6.5, 9.5) scale(0.45)" stroke="#00d8ff" strokeWidth="1.5" fill="none">
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(30 12 12)" />
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(90 12 12)" />
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(150 12 12)" />
-      <circle cx="12" cy="12" r="2.2" fill="#00d8ff" />
-    </g>
-  </svg>
-);
-
-const JSONIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 2a2 2 0 00-2 2v16a2 2 0 002 2h16a2 2 0 002-2V8l-6-6H4z" fill="#1e1f29" stroke="#2b2b2b" strokeWidth="1" />
-    <path d="M14 2v6h6" fill="#2c2d38" stroke="#2b2b2b" strokeWidth="1" />
-    <text x="6" y="16" fill="#cbd352" fontSize="9" fontFamily="monospace" fontWeight="bold">{"{}"}</text>
-  </svg>
-);
-
-const MarkdownIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 2a2 2 0 00-2 2v16a2 2 0 002 2h16a2 2 0 002-2V8l-6-6H4z" fill="#1e1f29" stroke="#2b2b2b" strokeWidth="1" />
-    <path d="M14 2v6h6" fill="#2c2d38" stroke="#2b2b2b" strokeWidth="1" />
-    <path d="M6.5 11v5h1.5v-3l1 1.5 1-1.5v3H11.5v-5H10l-1.25 1.75L7.5 11H6.5zm6.5 0v2.5H12v1.5h1v2.5l2.5-3.25L13 11z" fill="#519aba" />
-  </svg>
-);
 
 const FolderClosedIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
